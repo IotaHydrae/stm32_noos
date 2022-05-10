@@ -10,10 +10,11 @@ AR:=$(PREFIX)ar
 OBJCOPY:=$(PREFIX)objcopy
 OBJDUMP:=$(PREFIX)objdump
 
+FLAGS:=-c -mthumb -mcpu=cortex-m3 -g
 
-LINK_SCRIPT:=stm32f103ze.lds
+LINK_SCRIPT:=stm32_flash.ld
 
-objs:=head.o
+objs:=startup_stm32f10x_hd.o head.o
 
 default:led.bin
 
@@ -24,13 +25,17 @@ led.bin: clean $(objs)
 	$(OBJDUMP) -D -m arm led.elf > led.dis
 
 %.o:%.S
-	$(CC) -nostdlib -g -c -o $@ $<
+	$(CC) $(FLAGS) -o $@ $<
+%.o:%.s
+	$(CC) $(FLAGS) -o $@ $<
 %.o:%.c
-	$(CC) -nostdlib -g -c -o $@ $<
+	$(CC) $(FLAGS) -o $@ $<
 
 .PHONY:clean
 clean:
 	rm -rf *.img *.dis *.elf *.o *.bin
 
-.PHONY:write-flash
-write-flash:led.bin
+.PHONY:write
+write:led.bin
+	st-flash --reset write $< 0x08000000
+
