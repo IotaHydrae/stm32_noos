@@ -44,3 +44,10 @@ clean:
 write:led.bin
 	st-flash --connect-under-reset write $< 0x08000000
 
+.PHONY:fix-stlink
+fix-stlink:
+	sudo st-flash --connect-under-reset erase
+
+.PHONY:st-info
+st-info:
+	sudo st-info --probe
