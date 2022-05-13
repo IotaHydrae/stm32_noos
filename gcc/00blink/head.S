@@ -42,25 +42,26 @@ _main:
 
 	@ ldr bsrr reg val to r1
 	ldr r0, =(GPIOB_BASE + GPIOx_BSRR)
-	ldr r1, [r0]
 
 loop:
 	@ set gpio to low
+	ldr r1, [r0]
 	ldr r2, =#0x00200000
 	orr r1, r2
 	str r1, [r0]
 
 	@ make a delay
-	ldr r2, =#0x00000f00
+	ldr r2, =#0x0000f000
 	bl delay
 
 	@ set gpio to high
+	ldr r1, [r0]
 	ldr r2, =#0x00000020
 	orr r1, r2
 	str r1, [r0]
 
 	@ make a delay
-	ldr r2, =#0x00000f00
+	ldr r2, =#0x0000f000
 	bl delay
 
 	b loop

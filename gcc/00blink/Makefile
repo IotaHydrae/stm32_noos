@@ -9,27 +9,32 @@ LD:=$(PREFIX)ld
 AR:=$(PREFIX)ar
 OBJCOPY:=$(PREFIX)objcopy
 OBJDUMP:=$(PREFIX)objdump
+SIZE:=$(PREFIX)size
 
-FLAGS:=-c -mthumb -mcpu=cortex-m3 -g
+LIBSPEC:=-L/usr/lib/arm-none-eabi/newlib/
 
-LINK_SCRIPT:=stm32_flash.ld
+FLAGS:=-mcpu=cortex-m3 -mfloat-abi=soft -mthumb -g
 
-objs:=startup_stm32f10x_hd.o head.o
+LINK_SCRIPT:=STM32F103ZETX_FLASH.ld
+
+OBJS:= startup_stm32f103zetx.o \
+	head.o
 
 default:led.bin
 
-led.bin: clean $(objs)
-	$(LD) -T $(LINK_SCRIPT) -g $(objs) -o led.elf
+led.bin: clean $(OBJS)
+	$(LD) $(OBJS) $(LIBSPEC) -T $(LINK_SCRIPT) -lc -lm -o led.elf
 
 	$(OBJCOPY) -O binary -S led.elf led.bin
 	$(OBJDUMP) -D -m arm led.elf > led.dis
+	$(SIZE) led.elf
 
 %.o:%.S
-	$(CC) $(FLAGS) -o $@ $<
+	$(CC) -c $(FLAGS) $< -o $@
 %.o:%.s
-	$(CC) $(FLAGS) -o $@ $<
+	$(CC) -c $(FLAGS) $< -o $@
 %.o:%.c
-	$(CC) $(FLAGS) -o $@ $<
+	$(CC) -c $(FLAGS) $< -o $@
 
 .PHONY:clean
 clean:
@@ -37,5 +42,5 @@ clean:
 
 .PHONY:write
 write:led.bin
-	st-flash --reset write $< 0x08000000
+	st-flash --connect-under-reset write $< 0x08000000
 
