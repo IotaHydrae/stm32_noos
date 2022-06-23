@@ -24,13 +24,14 @@ defines stack and heap, It's used  by arm-none-eabi-ld.
 `startup_stm32f103zetx.s` - the init asm program
 
 this program used to do these works:
-
-1. copy the .data section
-2. clear the .bss section to zero
-3. jump to execute user code
-4. set the execption vectors table
-etc
-
+- Set the initial SP
+- Set the initial PC == Reset_Handler,
+- Set the vector table entries with the exceptions ISR address
+- Configure the clock system   
+- Configure external SRAM mounted on STM3210E-EVAL board
+  to be used as data memory (optional, to be enabled by user)
+- Branches to main in the C library (which eventually
+  calls main()).
 
 * `keil` - structre of keil build
 
